@@ -1,3 +1,4 @@
+# Lightweight Debian base
 FROM debian:stable-slim
 WORKDIR /render
 
@@ -18,5 +19,5 @@ RUN curl -fsSL https://tailscale.com/install.sh | sh
 COPY run-tailscale.sh /render/run-tailscale.sh
 RUN chmod +x /render/run-tailscale.sh
 
-# Start tailscale
+# Start Tailscale
 CMD ["/render/run-tailscale.sh"]
