@@ -2,11 +2,11 @@
 set -e
 
 # Start tailscaled in userspace mode with SOCKS5
-/usr/sbin/tailscaled --tun=userspace-networking --socks5-server=localhost:1055 &
+render/tailscaled --tun=userspace-networking --socks5-server=localhost:1055 &
 PID=$!
 
 # Wait until tailscaled is ready, then bring up Tailscale
-until /usr/sbin/tailscale up \
+until render/tailscale up \
   --authkey="${TAILSCALE_AUTHKEY}" \
   --hostname="${RENDER_SERVICE_NAME:-render-exit-node}" \
   --advertise-exit-node \
@@ -17,7 +17,7 @@ until /usr/sbin/tailscale up \
 done
 
 export ALL_PROXY=socks5://localhost:1055/
-tailscale_ip=$(/usr/sbin/tailscale ip)
+tailscale_ip=$(render/tailscale ip)
 echo "✅ Tailscale is up at IP ${tailscale_ip}, advertising as exit node"
 
 # --- KEEP ALIVE LOOP ---
