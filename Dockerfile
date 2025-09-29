@@ -1,28 +1,22 @@
-FROM debian:latest
+FROM debian:stable-slim
 WORKDIR /render
 
-ARG TAILSCALE_VERSION
-ENV TAILSCALE_VERSION=$TAILSCALE_VERSION
-
+# Install dependencies
 RUN apt-get -qq update \
-  && apt-get -qq install --upgrade -y --no-install-recommends \
-    apt-transport-https \
+  && apt-get -qq install -y --no-install-recommends \
     ca-certificates \
-    netcat-openbsd \
-    wget \
-    dnsutils \
-  > /dev/null \
+    curl \
+    iproute2 \
+    iptables \
   && apt-get -qq clean \
-  && rm -rf \
-    /var/lib/apt/lists/* \
-    /tmp/* \
-    /var/tmp/* \
-  && :
+  && rm -rf /var/lib/apt/lists/*
 
-RUN echo "+search +short" > /root/.digrc
-COPY run-tailscale.sh /render/
+# Install Tailscale
+RUN curl -fsSL https://tailscale.com/install.sh | sh
 
-COPY install-tailscale.sh /tmp
-RUN /tmp/install-tailscale.sh && rm -r /tmp/*
+# Copy startup script
+COPY run-tailscale.sh /render/run-tailscale.sh
+RUN chmod +x /render/run-tailscale.sh
 
-CMD ./run-tailscale.sh
+# Start tailscale
+CMD ["/render/run-tailscale.sh"]
