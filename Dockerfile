@@ -1,4 +1,4 @@
-# Lightweight Debian base
+# Use lightweight Debian
 FROM debian:stable-slim
 WORKDIR /render
 
