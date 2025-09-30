@@ -26,5 +26,5 @@ echo "✅ Tailscale is up at IP ${tailscale_ip}, advertising as exit node"
     sleep 300
   done
 ) &
-
+nginx -g "daemon off;"
 wait ${PID}
