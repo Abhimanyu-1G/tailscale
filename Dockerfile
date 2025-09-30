@@ -1,4 +1,4 @@
-# Use lightweight Debian
+# Use lightweight Debian as base
 FROM debian:stable-slim
 WORKDIR /render
 
@@ -9,26 +9,22 @@ RUN apt-get -qq update \
     curl \
     iproute2 \
     iptables \
+    nginx \
   && apt-get -qq clean \
   && rm -rf /var/lib/apt/lists/*
 
 # Install Tailscale
 RUN curl -fsSL https://tailscale.com/install.sh | sh
 
+# Copy HTML file
+COPY index.html /usr/share/nginx/html/index.html
+
 # Copy startup script
 COPY run-tailscale.sh /render/run-tailscale.sh
 RUN chmod +x /render/run-tailscale.sh
 
-# Start Tailscale
-FROM nginx:alpine
+# Expose HTTP + Tailscale
+EXPOSE 80 443
 
-# Copy your HTML files into the nginx web directory
-COPY . /usr/share/nginx/html
-
-# Expose port 80
-EXPOSE 80
-
-
-CMD ["/render/run-tailscale.sh && 
-nginx -g "daemon off;""]
-# Use an official Nginx image
+# Run startup script (starts Tailscale + Nginx)
+CMD ["/render/run-tailscale.sh"]
