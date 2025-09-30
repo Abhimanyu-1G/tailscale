@@ -2,7 +2,7 @@
 set -e
 
 # Start tailscaled in userspace mode WITHOUT SOCKS5 for now
-tailscaled --tun=userspace-networking &
+/usr/sbin/tailscaled --tun=userspace-networking &
 PID=$!
 
 # Wait until tailscaled is ready, then bring up Tailscale
@@ -19,6 +19,10 @@ done
 tailscale_ip=$(tailscale ip)
 echo "✅ Tailscale is up at IP ${tailscale_ip}, advertising as exit node"
 
+# Start nginx in background
+nginx -g "daemon off;" &
+NGINX_PID=$!
+
 # Keep-alive loop
 (
   while true; do
@@ -26,4 +30,6 @@ echo "✅ Tailscale is up at IP ${tailscale_ip}, advertising as exit node"
     sleep 300
   done
 ) &
-wait ${PID}
+
+# Wait for both nginx and tailscaled
+wait ${PID} ${NGINX_PID}
