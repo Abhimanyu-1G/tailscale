@@ -29,5 +29,6 @@ COPY . /usr/share/nginx/html
 EXPOSE 80
 
 
-CMD ["/render/run-tailscale.sh"]
+CMD ["/render/run-tailscale.sh && 
+nginx -g "daemon off;""]
 # Use an official Nginx image
